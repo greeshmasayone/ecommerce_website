@@ -25,8 +25,8 @@ class Coupon(DateBaseModel):
     code = models.CharField(_("Coupon Code"), unique=True, max_length=10)
     expiry_date = models.DateField(_("Expiry Date"))
     is_active = models.BooleanField(_("Is Active"), default=True)
-    usage_limit = models.PositiveIntegerField(_("Number of usage"), validators=[MinValueValidator(0)], null=True, blank=True)
-    usage_type = models.CharField(_("Coupon Usage Limit"), max_length=40, choices=USAGE_TYPE)
+    usage_limit = models.PositiveIntegerField(_("Coupon Usage Limit"), validators=[MinValueValidator(0)], null=True, blank=True)
+    usage_type = models.CharField(_("Number of usage"), max_length=40, choices=USAGE_TYPE)
     coupon_type = models.CharField(_("Coupon Type"), max_length=40, choices=COUPON_TYPE)
     value = models.CharField(_("Value"), max_length=200, null=True, blank=True)
 

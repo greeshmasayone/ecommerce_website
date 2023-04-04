@@ -35,7 +35,7 @@ class SubCategory(DateBaseModel):
 class Group(DateBaseModel):
     title = models.CharField(_("Name"), max_length=200)
     description = models.TextField(_("Description"), null=True, blank=True)
-    subcategory = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_("SubCategory"), related_name='get_groups')
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, verbose_name=_("SubCategory"), related_name='get_groups')
     created_at = models.DateTimeField(_("Created at"), null=True, blank=True)
 
     class Meta:
@@ -103,12 +103,14 @@ class Product(DateBaseModel):
     SHORT_SLEEVES = 'short_sleeves'
     THREE_QUARTER_SLEEVES = 'three_quarter_sleeves'
     SLEEVELESS = 'sleeveless'
+    NOT_APPLICABLE = 'not_applicable'
 
     SLEEVE_LENGTH_CHOICES = (
         (LONG_SLEEVES, "Long Sleeves"),
         (SHORT_SLEEVES, "Short Sleeves"),
         (THREE_QUARTER_SLEEVES, "Three Quarter Sleeves"),
-        (SLEEVELESS, "Sleeveless")
+        (SLEEVELESS, "Sleeveless"),
+        (NOT_APPLICABLE, "Not Applicable")
     )
 
     CASUAL = 'casual'
@@ -241,13 +243,14 @@ class Image(DateBaseModel):
 class ProductFabric(DateBaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("Product Fabric"), related_name='get_product_fabric')
     fabric = models.ForeignKey(Fabric, on_delete=models.CASCADE, verbose_name=_("Product Fabric Percentage"), related_name='get_fabric_details')
+    percentage = models.CharField(_("Percentage"), max_length=200, default='default_value', null=True, blank=True)
 
     class Meta:
         verbose_name = "product_fabric"
 
 
 class Stock(DateBaseModel):
-    stock = models.PositiveSmallIntegerField(_("Name"), validators=[MinValueValidator(0)])
+    stock = models.PositiveSmallIntegerField(_("Total Stock"), validators=[MinValueValidator(0)])
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("Product Stock"), related_name='get_stock')
 
     class Meta:

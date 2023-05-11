@@ -1,7 +1,7 @@
 from rest_framework import generics, status, viewsets
 from django.shortcuts import render, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
-from .serializers import WishlistSerializer, AddressSerializer, CartSerializer
+from .serializers import WishlistSerializer, AddressSerializer, CartSerializer, OrderSerializer
 from .models import Cart, Wishlist, Address, Order
 from rest_framework.response import Response
 from ..customer.models import User
@@ -116,3 +116,26 @@ class CartView(generics.ListCreateAPIView):
         )
         cart.total = cart.total_cost
         cart.save()
+
+
+class OrderView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def get_object(self):
+        user_pk = self.kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_pk)
+        return user
+
+    def post(self, request, *args, **kwargs):
+        serializer = OrderSerializer(data=request.data)
+        user = self.get_object()
+        if serializer.is_valid():
+            serializer.save(user=user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, *args, **kwargs):
+        user_pk = self.kwargs.get('user_id')
+        queryset = Order.objects.filter(user=user_pk)
+        serializer = OrderSerializer(queryset, many=True)
+        return Response(serializer.data)

@@ -52,6 +52,7 @@ class Order(DateBaseModel):
     WRONG_ITEM_SENT = 'wrong_item_sent'
     SHIPPING_BOX_DAMAGED = 'shipping_box_damaged'
     INADEQUATE_DESCRIPTION = 'inadequate_description'
+    NO_RETURN = 'no_return'
 
     RETURN_REASON = (
         (BOUGHT_BY_MISTAKE, "Bought By Mistake"),
@@ -63,7 +64,8 @@ class Order(DateBaseModel):
         (MISSING_ACCESSORIES, "Missing Accesories"),
         (WRONG_ITEM_SENT, "Wrong Item Sent"),
         (SHIPPING_BOX_DAMAGED, "Shipping box Damaged"),
-        (INADEQUATE_DESCRIPTION, "Inadequate Description")
+        (INADEQUATE_DESCRIPTION, "Inadequate Description"),
+        (NO_RETURN, 'No Return')
     )
     product = models.ManyToManyField(Product, verbose_name=_("Product"), related_name='product_order')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User Orders"), related_name='get_orders')

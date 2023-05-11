@@ -12,7 +12,8 @@ urlpatterns = [
     path('wishlist/<int:wishlist_pk>/', views.WishlistUpdateView.as_view()),
     path('user/<int:user_id>/address/', views.AddressView.as_view()),
     path('address/<int:address_pk>/', views.AddressUpdateView.as_view()),
-    path('cart/', views.CartView.as_view())
+    path('cart/', views.CartView.as_view()),
+    path('users/<int:user_id>/orders/', views.OrderView.as_view())
 
 ]
 urlpatterns += router.urls

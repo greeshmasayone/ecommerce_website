@@ -17,7 +17,7 @@ class Address(DateBaseModel):
         (OFFICE, "Office"),
         (OTHER, "Other")
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User Address"), related_name='get_address')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User Name"), related_name='get_address')
     locality = models.TextField(_("Locality"))
     city = models.CharField(_("City"), max_length=200)
     state = models.TextField(_("City"))
@@ -52,6 +52,7 @@ class Order(DateBaseModel):
     WRONG_ITEM_SENT = 'wrong_item_sent'
     SHIPPING_BOX_DAMAGED = 'shipping_box_damaged'
     INADEQUATE_DESCRIPTION = 'inadequate_description'
+    NO_RETURN = 'no_return'
 
     RETURN_REASON = (
         (BOUGHT_BY_MISTAKE, "Bought By Mistake"),
@@ -63,13 +64,17 @@ class Order(DateBaseModel):
         (MISSING_ACCESSORIES, "Missing Accesories"),
         (WRONG_ITEM_SENT, "Wrong Item Sent"),
         (SHIPPING_BOX_DAMAGED, "Shipping box Damaged"),
-        (INADEQUATE_DESCRIPTION, "Inadequate Description")
+        (INADEQUATE_DESCRIPTION, "Inadequate Description"),
+        (NO_RETURN, 'No Return')
     )
     product = models.ManyToManyField(Product, verbose_name=_("Product"), related_name='product_order')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User Orders"), related_name='get_orders')
-    address = models.ForeignKey(Address, on_delete=models.CASCADE, verbose_name=_("User Address"), related_name='get_address')
-    amount = models.DecimalField(_("Order Amount"), max_digits=12, decimal_places=2, default=1.00, validators=[MinValueValidator(1.00)])
-    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, verbose_name=_("User Coupon"), related_name='get_coupon')
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, verbose_name=_("User Address"),
+                                related_name='get_address')
+    amount = models.DecimalField(_("Order Amount"), max_digits=12, decimal_places=2, default=1.00,
+                                 validators=[MinValueValidator(1.00)])
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, verbose_name=_("User Coupon"),
+                               related_name='get_coupon')
     phone_number = models.CharField(_("Mobile Number"), max_length=15, null=False)
     order_id = models.CharField(_("Order Id"), max_length=10, null=False, unique=True)
     ordered_date = models.DateField(_("Order Date"))
@@ -84,8 +89,9 @@ class Order(DateBaseModel):
 
 
 class Wishlist(DateBaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("Wishlist"), related_name='get_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("User Products"), related_name='get_wishlist')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User"), related_name='get_items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("User Products"),
+                                related_name='get_wishlist')
 
     class Meta:
         verbose_name = "wishlist"
@@ -93,13 +99,23 @@ class Wishlist(DateBaseModel):
 
 
 class Cart(DateBaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("Cart"), related_name='get_cart_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("User Items"), related_name='get_cart')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User"), related_name='get_cart_items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("User Items"),
+                                related_name='get_cart')
     product_quantity = models.IntegerField(_("Product quantity"), default=1)
 
     class Meta:
         verbose_name = "cart"
         verbose_name_plural = "cart"
 
+    @property
+    def product_cost(self):
+        return self.product_quantity * self.product.price
 
+    # def get_cart_count(self):
+    #     return Cart.objects.filter(user=self.user).count()
+
+    # @property
+    # def total_cost(self):
+    #     return sum[(int(self.product_quantity)) * (int(self.product.price))]
 
